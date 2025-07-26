@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Newtonsoft.Json;EMRE WAS HERE
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,6 +69,7 @@ public class MainRibbon : Office.IRibbonExtensibility
 
     public async void OnLoadRibbon_Click(Office.IRibbonControl control)
     {
+        // Supabase'in kullandığı modern güvenlik protokolünü (TLS 1.2) kullanmaya zorla.2
         // Supabase'in kullandığı modern güvenlik protokolünü (TLS 1.2) kullanmaya zorla.
         System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
 
@@ -77,7 +78,7 @@ public class MainRibbon : Office.IRibbonExtensibility
         string machineId = MachineIdentifier.GetMachineGuid();
         if (string.IsNullOrEmpty(machineId))
         {
-            MessageBox.Show("Bu bilgisayarın benzersiz kimliği alınamadı! Eklenti devam edemez.", "Kritik Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Bu bilgisayarın benzersiz kimliği alınamadı! Eklenti devam edemez. Sistem yöneticinizle görüşünüz.", "Kritik Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 
