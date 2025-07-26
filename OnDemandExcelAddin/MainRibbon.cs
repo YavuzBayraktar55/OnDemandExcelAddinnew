@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;EMRE WAS HERE
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
