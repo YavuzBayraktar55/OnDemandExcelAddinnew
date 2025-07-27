@@ -62,8 +62,12 @@ public class MainRibbon : Office.IRibbonExtensibility
         _isLoadAttempted = false;
         _isAuthorized = false;
     }
-
-    public async void OnLoadRibbon_Click(Office.IRibbonControl control)
+    public class AppSettings
+    {
+        public string SupabaseUrl { get; set; }
+        public string SupabaseAnonKey { get; set; }
+    }
+    public async void OnLoadRibbon_Click(Office.IRibbonControl _)
     {
         System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
         if (_isLoadAttempted) return;
@@ -79,8 +83,22 @@ public class MainRibbon : Office.IRibbonExtensibility
         {
             try
             {
-                string supabaseFunctionUrl = "https://gpdjsnwplzqdwrwanzis.supabase.co/functions/v1/get-device-config";
-                string supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwZGpzbndwbHpxZHdyd2FuemlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI2ODgwMzcsImV4cCI6MjA2ODI2NDAzN30.i9wL-7T7gPzJ1t_J8wH9Uu-l_d_M8fN8y_Q8w_YxH0M";
+                // 1. Ayar dosyasının yolunu belirle
+                string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OnDemandExcelAddin", "settings.json");
+
+                if (!File.Exists(settingsPath))
+                {
+                    MessageBox.Show("Ayar dosyası bulunamadı!");
+                    return;
+                }
+
+                // 2. Dosyayı oku ve C# nesnesine çevir
+                string settingsJson = File.ReadAllText(settingsPath);
+                AppSettings settings = JsonConvert.DeserializeObject<AppSettings>(settingsJson);
+
+                // 3. Değişkenleri kod içinden değil, ayar dosyasından al
+                string supabaseFunctionUrl = settings.SupabaseUrl;
+                string supabaseAnonKey = settings.SupabaseAnonKey;
 
                 client.DefaultRequestHeaders.Add("apikey", supabaseAnonKey);
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {supabaseAnonKey}");
