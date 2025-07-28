@@ -14,7 +14,7 @@
 				<!-- Admin Grubu Şablonu -->
 				<group id="grpAdmin" getLabel="GetLabel" getVisible="GetVisible_Dynamic">
 					<splitButton id="splitAdminActions" size="large" getVisible="GetVisible_Dynamic">
-						<button id="btnAdminMain" onAction="OnAction"/>
+						<button id="btnAdminMain" getLabel="GetLabel" onAction="OnAction" getImage="GetImage"/>
 						<menu>
 							<button id="btnAddDevice" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
 							<button id="btnSetPermissions" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
@@ -30,8 +30,9 @@
 						DEĞİŞİKLİK BURADA:
 						ID, JSON'daki tanıma uyması için "btnSendData" yerine "btnOpenForm" olarak değiştirildi.
 					-->
-					<button id="btnOpenForm" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic" size="large"/>
-					
+					<button id="btnOpenForm" getLabel="GetLabel" onAction="OnAction"
+        getVisible="GetVisible_Dynamic" size="large"
+        getImage="GetImage"/>
 				</group>
 
 			</tab>

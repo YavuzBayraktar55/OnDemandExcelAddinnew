@@ -39,7 +39,29 @@ public class MainRibbon : Office.IRibbonExtensibility
     private Office.IRibbonUI ribbon;
     private static RibbonConfig _config;
     private static bool _isLoadAttempted = false;
+    public stdole.IPictureDisp GetImage(Office.IRibbonControl control)
+    {
+        try
+        {
+            switch (control.Id)
+            {
+                case "btnOpenForm":
+                case "btnAdminMain":
+                    return PictureConverter.GetImage("OnDemandExcelAddin.Resources.Admin32.png");
 
+                case "btnSetPermissions":
+                    return PictureConverter.GetImage("OnDemandExcelAddin.Resources.Permissions32.png");
+
+                case "btnCreateReport":
+                    return PictureConverter.GetImage("OnDemandExcelAddin.Resources.Report32.png");
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"GetImage metodu içinde bir hata oluştu (ID: {control.Id}):\n\n{ex.ToString()}", "Resim Yükleme Hatası");
+        }
+        return null;
+    }
     public string GetCustomUI(string ribbonID)
     {
         try
@@ -230,6 +252,36 @@ internal class PictureConverter : AxHost
 {
     private PictureConverter() : base(null) { }
 
+    public static stdole.IPictureDisp GetImage(string imageName)
+    {
+        // Bu metodun kendisi zaten try-catch içeriyor, bu iyi.
+        try
+        {
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(imageName);
+            if (stream != null)
+            {
+                using (Bitmap bmp = new Bitmap(stream))
+                {
+                    return (stdole.IPictureDisp)GetIPictureDispFromPicture(bmp);
+                }
+            }
+            else
+            {
+                // Eğer stream null ise, bu kaynak adının yanlış olduğu anlamına gelir.
+                MessageBox.Show($"Gömülü kaynak bulunamadı:\n\n{imageName}\n\nLütfen proje ad alanını ve dosya adını kontrol edin.", "Resim Kaynak Hatası");
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"PictureConverter içinde hata oluştu (Resim Adı: {imageName}):\n\n{ex.ToString()}", "Resim Dönüştürme Hatası");
+        }
+        return null;
+    }
+}
+//internal class PictureConverter : AxHost
+//{
+//    private PictureConverter() : base(null) { }
+
     //public static stdole.IPictureDisp GetImage(string imageName)
     //{
     //    try
@@ -251,7 +303,7 @@ internal class PictureConverter : AxHost
     //    }
     //    return null;
     //}
-}
+
 
 // Not: Bu dosyada FrmKayitEkrani sınıfı yok, bu sınıfı ayrı bir dosyada tutmak daha temiz bir yaklaşımdır.
 // Eğer hala aynı dosyada tutuyorsanız, buraya ekleyebilirsiniz.
