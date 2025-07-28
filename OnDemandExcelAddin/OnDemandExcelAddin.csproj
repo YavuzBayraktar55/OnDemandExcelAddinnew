@@ -272,6 +272,17 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Admin32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AddDevice.16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\SetPermissions.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\MarginNarrow.png" />
+    <EmbeddedResource Include="Resources\MarginNormal.png" />
+    <EmbeddedResource Include="Resources\MarginWide.png" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

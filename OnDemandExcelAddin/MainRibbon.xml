@@ -9,15 +9,52 @@
 							label="Menüleri Yükle"
 							size="large"
 							onAction="OnLoadRibbon_Click"/>
+
+					<menu id="menuStaticTest"
+	  label="Statik Test Menüsü"
+	  size="large"
+	  imageMso="ChartTypeWaterfall">
+						<button id="btnStatic1"
+								label="Statik Buton 1"
+								onAction="OnAction"/>
+						<button id="btnStatic2"
+								label="Statik Buton 2"
+								imageMso="HappyFace"
+								onAction="OnAction"/>
+						<menuSeparator id="sep1"/>
+						<button id="btnStatic3"
+								label="Statik Buton 3"
+								onAction="OnAction"/>
+					</menu>
+
+					<gallery id="galleryStaticTest"
+							 label="Statik Galeri Testi"
+							 size="large"
+							 imageMso="PageMarginsGallery"
+							 columns="1"
+						
+						rows="3"  
+						onAction="OnGalleryAction"
+						getItemCount="OnGetItemCount"
+						getItemLabel="OnGetItemLabel"
+						getItemImage="OnGetItemImage"
+						getItemScreentip="OnGetItemScreentip"
+						getItemSupertip="OnGetItemSupertip">
+					</gallery>				
+					
+					
+					
 				</group>
+
+
 
 				<!-- Admin Grubu Şablonu -->
 				<group id="grpAdmin" getLabel="GetLabel" getVisible="GetVisible_Dynamic">
 					<splitButton id="splitAdminActions" size="large" getVisible="GetVisible_Dynamic">
 						<button id="btnAdminMain" getLabel="GetLabel" onAction="OnAction" getImage="GetImage"/>
 						<menu>
-							<button id="btnAddDevice" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
-							<button id="btnSetPermissions" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
+							<button id="btnAddDevice" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic" getImage="GetImage"/>
+							<button id="btnSetPermissions" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic" getImage="GetImage"/>
 						</menu>
 					</splitButton>
 				</group>

@@ -46,11 +46,13 @@ public class MainRibbon : Office.IRibbonExtensibility
             switch (control.Id)
             {
                 case "btnOpenForm":
+                    return PictureConverter.GetImage("AddDevice.16.png");
                 case "btnAdminMain":
                     return PictureConverter.GetImage("Admin32.png");
-
+                case "btnAddDevice":
+                    return PictureConverter.GetImage("AddDevice.16.png");
                 case "btnSetPermissions":
-                    return PictureConverter.GetImage("Permissions32.png");
+                    return PictureConverter.GetImage("SetPermissions.png");
 
                 case "btnCreateReport":
                     return PictureConverter.GetImage("Report32.png");
@@ -180,6 +182,20 @@ public class MainRibbon : Office.IRibbonExtensibility
     {
         switch (control.Id)
         {
+
+            // --- YENİ EKLENEN STATİK BUTONLAR ---
+            case "btnStatic1":
+                MessageBox.Show("Statik Test Menüsü - Buton 1'e tıklandı.", "Statik Test");
+                break;
+            case "btnStatic2":
+                MessageBox.Show("Statik Test Menüsü - Buton 2'ye tıklandı.", "Statik Test");
+                break;
+            case "btnStatic3":
+                MessageBox.Show("Statik Test Menüsü - Buton 3'e tıklandı.", "Statik Test");
+                break;
+            // ------------------------------------
+
+
             case "btnOpenForm":
                 using (var frm = new FrmKayitEkrani())
                 {
@@ -230,7 +246,55 @@ public class MainRibbon : Office.IRibbonExtensibility
         }
         return null;
     }
+
+    #region Gallery Callback Methods
+
+    private List<string> galleryItems = new List<string> { "Normal", "Geniş", "Dar" };
+
+    // Galeriye tıklandığında bu metod çalışır.
+    public void OnGalleryAction(Office.IRibbonControl control, string id, int index)
+    {
+        MessageBox.Show($"Galeriden '{galleryItems[index]}' seçeneği seçildi (index: {index})", "Galeri Testi");
+    }
+
+    // Galeride kaç öğe olduğunu söyler.
+    public int OnGetItemCount(Office.IRibbonControl control)
+    {
+        return galleryItems.Count;
+    }
+
+    // Belirli bir index'teki öğenin etiketini döndürür.
+    public string OnGetItemLabel(Office.IRibbonControl control, int index)
+    {
+        return galleryItems[index];
+    }
+
+    // Belirli bir index'teki öğenin resmini döndürür.
+    public stdole.IPictureDisp OnGetItemImage(Office.IRibbonControl control, int index)
+    {
+        switch (index)
+        {
+            case 0: return PictureConverter.GetImage("MarginNormal.png");
+            case 1: return PictureConverter.GetImage("MarginWide.png");
+            case 2: return PictureConverter.GetImage("MarginNarrow.png");
+            default: return null;
+        }
+    }
+
+    // Belirli bir index'teki öğenin ipucunu döndürür.
+    public string OnGetItemScreentip(Office.IRibbonControl control, int index)
+    {
+        return $"{galleryItems[index]} Kenar Boşluğu";
+    }
+
+    public string OnGetItemSupertip(Office.IRibbonControl control, int index)
+    {
+        return $"Sayfa kenar boşluklarını '{galleryItems[index]}' olarak ayarlar.";
+    }
+
+    #endregion
 }
+
 internal class PictureConverter : AxHost
 {
     private PictureConverter() : base(null) { }
