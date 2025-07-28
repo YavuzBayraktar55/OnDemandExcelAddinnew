@@ -229,6 +229,9 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="FrmKayitEkrani.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MachineIdentifier.cs" />
     <EmbeddedResource Include="MainRibbon.xml" />
     <Compile Include="MainRibbon.cs" />
@@ -265,6 +268,9 @@
       <DependentUpon>ThisAddIn.Designer.xml</DependentUpon>
     </Compile>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Admin32.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

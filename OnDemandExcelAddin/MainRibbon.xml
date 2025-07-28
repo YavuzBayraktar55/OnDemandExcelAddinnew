@@ -2,43 +2,39 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
 	<ribbon>
 		<tabs>
-			<tab id="tabLoader" label="Eklenti" getVisible="GetVisible_LoadButton">
-				<group id="grpLoader" label="Yönetim">
-					<button id="btnLoadRibbon" label="Sekmeleri Yükle" size="large" onAction="OnLoadRibbon_Click" getVisible="GetVisible_LoadButton"/>
+			<tab id="tabAyKa" label="Ay-Ka">
+
+				<group id="grpLoader" label="Yönetim" getVisible="GetVisible_LoadGroup">
+					<button id="btnLoadRibbon"
+							label="Menüleri Yükle"
+							size="large"
+							onAction="OnLoadRibbon_Click"/>
 				</group>
-			</tab>
 
-			<!-- Test Sekmesi 1 Şablonu -->
-			<tab id="tabTest1" getLabel="GetLabel" getVisible="GetVisible_Dynamic">
-				<group id="groupA" getLabel="GetLabel" getVisible="GetVisible_Dynamic">
-
-					<button id="btnHello" size="large" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
-
-					<!-- 
-						splitButton NİHAİ YAPI:
-						- getVisible: Sadece ana <splitButton> etiketinde bulunur.
-						- getLabel: Ana <splitButton> etiketinde bulunmaz, çünkü etiketi yoktur.
-						- Etiket, içindeki <button id="splitMain"> tarafından yönetilir.
-					-->
-					<splitButton id="splitBtnExample" size="large" getVisible="GetVisible_Dynamic">
-						<button id="splitMain" onAction="OnAction" getLabel="GetLabel"/>
+				<!-- Admin Grubu Şablonu -->
+				<group id="grpAdmin" getLabel="GetLabel" getVisible="GetVisible_Dynamic">
+					<splitButton id="splitAdminActions" size="large" getVisible="GetVisible_Dynamic">
+						<button id="btnAdminMain" onAction="OnAction"/>
 						<menu>
-							<button id="splitAlt1" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
-							<button id="splitAlt2" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
-							<button id="splitAlt3" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
+							<button id="btnAddDevice" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
+							<button id="btnSetPermissions" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
 						</menu>
 					</splitButton>
-
 				</group>
-			</tab>
 
-			<!-- Test Sekmesi 2 Şablonu -->
-			<tab id="tabTest2" getLabel="GetLabel" getVisible="GetVisible_Dynamic">
-				<group id="groupB" getLabel="GetLabel" getVisible="GetVisible_Dynamic">
-					<button id="btnInfo" size="large" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic"/>
+				<!-- Kullanıcı Grubu Şablonu (ID'si güncellendi) -->
+				<group id="grpUserActions" getLabel="GetLabel" getVisible="GetVisible_Dynamic">
+					<button id="btnCreateReport" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic" size="large"/>
+
+					<!-- 
+						DEĞİŞİKLİK BURADA:
+						ID, JSON'daki tanıma uyması için "btnSendData" yerine "btnOpenForm" olarak değiştirildi.
+					-->
+					<button id="btnOpenForm" getLabel="GetLabel" onAction="OnAction" getVisible="GetVisible_Dynamic" size="large"/>
+					
 				</group>
-			</tab>
 
+			</tab>
 		</tabs>
 	</ribbon>
 </customUI>
