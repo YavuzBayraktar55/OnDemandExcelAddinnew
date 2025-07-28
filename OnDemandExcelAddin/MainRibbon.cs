@@ -11,7 +11,6 @@ using System.Text;
 using System.Windows.Forms;
 using Office = Microsoft.Office.Core;
 
-// JSON Model Sınıfları (Yeni mimariye uygun)
 public class RibbonConfig
 {
     [JsonProperty("groups")]
@@ -39,6 +38,7 @@ public class MainRibbon : Office.IRibbonExtensibility
     private Office.IRibbonUI ribbon;
     private static RibbonConfig _config;
     private static bool _isLoadAttempted = false;
+
     public stdole.IPictureDisp GetImage(Office.IRibbonControl control)
     {
         try
@@ -47,64 +47,50 @@ public class MainRibbon : Office.IRibbonExtensibility
             {
                 case "btnOpenForm":
                 case "btnAdminMain":
-                    return PictureConverter.GetImage("OnDemandExcelAddin.Resources.Admin32.png");
+                    return PictureConverter.GetImage("Admin32.png");
 
                 case "btnSetPermissions":
-                    return PictureConverter.GetImage("OnDemandExcelAddin.Resources.Permissions32.png");
+                    return PictureConverter.GetImage("Permissions32.png");
 
                 case "btnCreateReport":
-                    return PictureConverter.GetImage("OnDemandExcelAddin.Resources.Report32.png");
+                    return PictureConverter.GetImage("Report32.png");
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"GetImage metodu içinde bir hata oluştu (ID: {control.Id}):\n\n{ex.ToString()}", "Resim Yükleme Hatası");
+            MessageBox.Show($"GetImage metodu içinde bir hata oluştu (ID: {control.Id}):\n\n{ex}", "Resim Yükleme Hatası");
         }
         return null;
     }
+
     public string GetCustomUI(string ribbonID)
     {
         try
         {
             var assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
             string resourceName = $"{assemblyName}.MainRibbon.xml";
+
             using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
             {
                 if (stream == null)
                 {
-                    MessageBox.Show($"Kaynak akışı (stream) bulunamadı! XML dosya adı ({resourceName}) veya 'Derleme Eylemi' ayarı yanlış olabilir.", "Kritik Eklenti Hatası");
+                    MessageBox.Show($"Kaynak XML bulunamadı: {resourceName}", "XML Yükleme Hatası");
                     return null;
                 }
-                using (StreamReader resourceReader = new StreamReader(stream))
+
+                using (StreamReader reader = new StreamReader(stream))
                 {
-                    return resourceReader.ReadToEnd();
+                    return reader.ReadToEnd();
                 }
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show("GetCustomUI metodunda kritik bir hata oluştu:\n\n" + ex.ToString(), "Kritik Eklenti Hatası");
+            MessageBox.Show("Ribbon XML yüklenirken hata:\n\n" + ex.ToString(), "Ribbon Hatası");
             return null;
         }
     }
-    //// --- GÖRÜNTÜ YÜKLEME METODU GÜNCELLENDİ ---
-    //public stdole.IPictureDisp GetImage(Office.IRibbonControl control)
-    //{
-    //    // Butonun ID'sine göre hangi resmi yükleyeceğimizi seçiyoruz.
-    //    switch (control.Id)
-    //    {
-    //        case "btnAdminMain":
-    //            // Lütfen projenizde "Resources" klasörü altında "Admin32.png" adında bir resim olduğundan
-    //            // ve "Derleme Eylemi"nin "Gömülü Kaynak" olduğundan emin olun.
-    //            return PictureConverter.GetImage("OnDemandExcelAddin.Resources.Admin32.png");
 
-    //        //case "btnOpenForm":
-    //        //    // Lütfen projenizde "Resources" klasörü altında "sayacNe32x32.png" adında bir resim olduğundan
-    //        //    // ve "Derleme Eylemi"nin "Gömülü Kaynak" olduğundan emin olun.
-    //        //    return PictureConverter.GetImage("OnDemandExcelAddin.Resources.sayacNe32x32.png");
-    //    }
-    //    return null; // Eşleşen bir ID yoksa resim yükleme.
-    //}
     public void Ribbon_Load(Office.IRibbonUI ribbonUI)
     {
         this.ribbon = ribbonUI;
@@ -115,38 +101,41 @@ public class MainRibbon : Office.IRibbonExtensibility
     public async void OnLoadRibbon_Click(Office.IRibbonControl _)
     {
         System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+
         if (_isLoadAttempted) return;
 
         string machineId = MachineIdentifier.GetMachineGuid();
         if (string.IsNullOrEmpty(machineId))
         {
-            MessageBox.Show("Bu bilgisayarın benzersiz kimliği alınamadı!", "Kritik Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Makine kimliği alınamadı.", "Kritik Hata");
             return;
         }
 
-        using (var client = new HttpClient())
+        try
         {
-            try
+            var assembly = Assembly.GetExecutingAssembly();
+            string appName = assembly.GetName().Name;
+            string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName, "settings.json");
+
+            if (!File.Exists(settingsPath))
             {
-                var assembly = Assembly.GetExecutingAssembly();
-                string appName = assembly.GetName().Name;
-                string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName, "settings.json");
+                MessageBox.Show($"Ayar dosyası eksik: {settingsPath}", "Hata");
+                return;
+            }
 
-                if (!File.Exists(settingsPath))
-                {
-                    MessageBox.Show($"Ayar dosyası bulunamadı!\nBeklenen Konum: {settingsPath}", "Yapılandırma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+            string settingsJson = File.ReadAllText(settingsPath);
+            var settings = JsonConvert.DeserializeObject<dynamic>(settingsJson);
+            string supabaseFunctionUrl = settings.SupabaseUrl;
+            string supabaseAnonKey = settings.SupabaseAnonKey;
 
-                string settingsJson = File.ReadAllText(settingsPath);
-                var settings = JsonConvert.DeserializeObject<dynamic>(settingsJson);
-                string supabaseFunctionUrl = settings.SupabaseUrl;
-                string supabaseAnonKey = settings.SupabaseAnonKey;
-
+            using (var client = new HttpClient())
+            {
                 client.DefaultRequestHeaders.Add("apikey", supabaseAnonKey);
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {supabaseAnonKey}");
+
                 var payload = new { machine_uuid = machineId };
                 var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+
                 var response = await client.PostAsync(supabaseFunctionUrl, content);
 
                 if (response.IsSuccessStatusCode)
@@ -156,27 +145,23 @@ public class MainRibbon : Office.IRibbonExtensibility
                 }
                 else
                 {
-                    _config = null; // Yetki yoksa veya hata varsa config'i boşalt
-                    string unauthorizedMessage = "Bu bilgisayar için yetki bulunamadı.\n\nLütfen aşağıdaki cihaz kimliğini sistem yöneticinize iletin. Kimlik panonuza kopyalandı:\n\n" + machineId;
                     Clipboard.SetText(machineId);
-                    MessageBox.Show(unauthorizedMessage, "Yetki Reddedildi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Bu bilgisayara yetki verilmemiş.\nCihaz kimliği panoya kopyalandı:\n" + machineId, "Yetkisiz");
+                    _config = null;
                 }
             }
-            catch (Exception ex)
-            {
-                _config = null; // Hata durumunda config'i boşalt
-                MessageBox.Show("Ayarlar sunucusuna bağlanırken detaylı bir hata oluştu:\n\n" + ex.ToString(), "Ağ Hatası (Detaylı)", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Ağ hatası oluştu:\n\n" + ex.ToString(), "Bağlantı Hatası");
+            _config = null;
         }
 
         _isLoadAttempted = true;
-        this.ribbon?.Invalidate(); // Arayüzü yeniden çizdir.
+        ribbon?.Invalidate();
     }
 
-    public bool GetVisible_LoadGroup(Office.IRibbonControl _)
-    {
-        return !_isLoadAttempted;
-    }
+    public bool GetVisible_LoadGroup(Office.IRibbonControl _) => !_isLoadAttempted;
 
     public bool GetVisible_Dynamic(Office.IRibbonControl control)
     {
@@ -187,15 +172,14 @@ public class MainRibbon : Office.IRibbonExtensibility
     public string GetLabel(Office.IRibbonControl control)
     {
         if (!_isLoadAttempted || _config == null) return "";
-        var foundControl = FindControlById(control.Id);
-        return foundControl?.Label ?? "";
+        var found = FindControlById(control.Id);
+        return found?.Label ?? "";
     }
 
     public void OnAction(Office.IRibbonControl control)
     {
         switch (control.Id)
         {
-            // YENİ EKLENDİ: Bu buton FrmKayitEkrani'nı açacak.
             case "btnOpenForm":
                 using (var frm = new FrmKayitEkrani())
                 {
@@ -205,11 +189,11 @@ public class MainRibbon : Office.IRibbonExtensibility
 
             case "btnAdminMain":
             case "btnAddDevice":
-                MessageBox.Show("Yeni cihaz ekleme formu burada açılacak.");
+                MessageBox.Show("Yeni cihaz ekleme ekranı açılacak.");
                 break;
 
             case "btnSetPermissions":
-                MessageBox.Show("Yetki düzenleme ekranı burada açılacak.");
+                MessageBox.Show("Yetki ayar ekranı açılacak.");
                 break;
 
             case "btnCreateReport":
@@ -225,11 +209,9 @@ public class MainRibbon : Office.IRibbonExtensibility
         foreach (var group in _config.Groups)
         {
             if (group.Id == id) return new RibbonControl { Id = id, Label = group.Label };
-            if (group.Controls != null)
-            {
-                var foundControl = FindInControlList(group.Controls, id);
-                if (foundControl != null) return foundControl;
-            }
+
+            var found = FindInControlList(group.Controls, id);
+            if (found != null) return found;
         }
         return null;
     }
@@ -239,6 +221,7 @@ public class MainRibbon : Office.IRibbonExtensibility
         foreach (var control in controls)
         {
             if (control.Id == id) return control;
+
             if (control.Items != null && control.Items.Any())
             {
                 var foundInItems = FindInControlList(control.Items, id);
@@ -252,59 +235,36 @@ internal class PictureConverter : AxHost
 {
     private PictureConverter() : base(null) { }
 
-    public static stdole.IPictureDisp GetImage(string imageName)
+    public static stdole.IPictureDisp GetImage(string imageFileName)
     {
-        // Bu metodun kendisi zaten try-catch içeriyor, bu iyi.
         try
         {
-            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(imageName);
-            if (stream != null)
+            var assembly = Assembly.GetExecutingAssembly();
+            var assemblyName = assembly.GetName().Name;
+
+            // Resources klasörüne gömülü tüm alt klasörler dahil
+            string fullResourceName = $"{assemblyName}.Resources.{imageFileName.Replace("\\", ".").Replace("/", ".")}";
+
+            using (Stream stream = assembly.GetManifestResourceStream(fullResourceName))
             {
-                using (Bitmap bmp = new Bitmap(stream))
+                if (stream != null)
                 {
-                    return (stdole.IPictureDisp)GetIPictureDispFromPicture(bmp);
+                    using (Bitmap bmp = new Bitmap(stream))
+                    {
+                        return (stdole.IPictureDisp)GetIPictureDispFromPicture(bmp);
+                    }
                 }
-            }
-            else
-            {
-                // Eğer stream null ise, bu kaynak adının yanlış olduğu anlamına gelir.
-                MessageBox.Show($"Gömülü kaynak bulunamadı:\n\n{imageName}\n\nLütfen proje ad alanını ve dosya adını kontrol edin.", "Resim Kaynak Hatası");
+                else
+                {
+                    MessageBox.Show($"Gömülü kaynak bulunamadı:\n\n{fullResourceName}", "Resim Kaynak Hatası");
+                }
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"PictureConverter içinde hata oluştu (Resim Adı: {imageName}):\n\n{ex.ToString()}", "Resim Dönüştürme Hatası");
+            MessageBox.Show($"PictureConverter içinde hata oluştu:\n\n{ex}", "Resim Dönüştürme Hatası");
         }
+
         return null;
     }
 }
-//internal class PictureConverter : AxHost
-//{
-//    private PictureConverter() : base(null) { }
-
-    //public static stdole.IPictureDisp GetImage(string imageName)
-    //{
-    //    try
-    //    {
-    //        // Projenin bütününden (assembly) kaynak akışını (stream) bul.
-    //        Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(imageName);
-    //        if (stream != null)
-    //        {
-    //            // Akıştan bir Bitmap oluştur.
-    //            Bitmap bmp = new Bitmap(stream);
-    //            // Bitmap'i Office'in anladığı IPictureDisp formatına çevir.
-    //            return (stdole.IPictureDisp)GetIPictureDispFromPicture(bmp);
-    //        }
-    //    }
-    //    catch (Exception)
-    //    {
-    //        // Hata olursa (resim bulunamazsa vb.) boş döndür.
-    //        return null;
-    //    }
-    //    return null;
-    //}
-
-
-// Not: Bu dosyada FrmKayitEkrani sınıfı yok, bu sınıfı ayrı bir dosyada tutmak daha temiz bir yaklaşımdır.
-// Eğer hala aynı dosyada tutuyorsanız, buraya ekleyebilirsiniz.
-
