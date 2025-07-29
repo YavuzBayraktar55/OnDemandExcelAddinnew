@@ -249,7 +249,7 @@ public class MainRibbon : Office.IRibbonExtensibility
 
     #region Gallery Callback Methods
 
-    private List<string> galleryItems = new List<string> { "Normal", "Geniş", "Dar" };
+    private List<string> galleryItems = new List<string> { "Cihaz Yönetimi", "Yetki Yönetimi", "Cihaz Değiştir" };
 
     // Galeriye tıklandığında bu metod çalışır.
     public void OnGalleryAction(Office.IRibbonControl control, string id, int index)
@@ -274,7 +274,7 @@ public class MainRibbon : Office.IRibbonExtensibility
     {
         switch (index)
         {
-            case 0: return PictureConverter.GetImage("MarginNormal.png");
+            case 0: return PictureConverter.GetImage("AddDevice.48.png");
             case 1: return PictureConverter.GetImage("MarginWide.png");
             case 2: return PictureConverter.GetImage("MarginNarrow.png");
             default: return null;

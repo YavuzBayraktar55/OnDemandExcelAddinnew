@@ -283,6 +283,9 @@
     <EmbeddedResource Include="Resources\MarginNormal.png" />
     <EmbeddedResource Include="Resources\MarginWide.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AddDevice.48.png" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
